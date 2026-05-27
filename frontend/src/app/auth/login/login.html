@@ -1,0 +1,31 @@
+<div class="container-fluid vh-100 d-flex justify-content-center align-items-center bg-dark">
+    <div class="card shadow-lg p-4 rounded-4 login-card">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-primary">MPloyChek Portal</h2>
+            <p class="text-muted">Login to continue</p>
+        </div>
+        <form>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">User ID</label>
+                <input type="text" class="form-control form-control-lg" placeholder="Enter User ID" [(ngModel)]="userId" name="userId">
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Password</label>
+                <input type="password" class="form-control form-control-lg" placeholder="Enter Password" [(ngModel)]="password" name="password">
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Role</label>
+                <select class="form-select form-select-lg" [(ngModel)]="role" name="role">
+                    <option value="General User">General User</option>
+                    <option value="Admin">Admin</option>
+                </select>
+            </div>
+            <div class="d-grid">
+                <button type="button" class="btn btn-primary btn-lg" (click)="login()">
+                    <span *ngIf="!loading">Login</span>
+                    <span *ngIf="loading">Loading...</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
