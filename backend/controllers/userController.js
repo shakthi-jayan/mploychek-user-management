@@ -4,14 +4,10 @@ import bcrypt from "bcryptjs"
 export const getAllUsers = async (req, res) => {
     try {
         const users = await User.find()
-
         await new Promise(resolve => setTimeout(resolve, 3000))
-
         res.status(200).json(users)
-
     } catch (e) {
         console.log("Error:", e)
-
         res.status(500).json({
             message: "Error fetching users"
         })
