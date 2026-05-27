@@ -1,79 +1,68 @@
-import { CommonModule } from '@angular/common'
-import { Component, OnInit } from '@angular/core'
-import { FormsModule } from '@angular/forms'
-import { Router } from '@angular/router'
-import { UserService } from '../../services/user.service'
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
+import { environment } from '../../environments/environment';
 
-@Component({
-  selector: 'app-admin-dashboard',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './admin-dashboard.html',
-  styleUrl: './admin-dashboard.css'
+interface User {
+  userId: string;
+  password?: string;
+  role: string;
+}
+
+interface LoginResponse {
+  message: string;
+  user: User;
+}
+
+interface DashboardData {
+  totalRecords: number;
+  verifiedRecords: number;
+  pendingRecords: number;
+  verificationRecords: any[];
+}
+
+@Injectable({
+  providedIn: 'root'
 })
-export class AdminDashboard implements OnInit {
-  users: any[] = []
-  loading = false
-  errorMessage = ''
-  userId = ''
-  password = ''
-  role = 'General User'
+export class UserService {
+  private apiUrl = environment.apiUrl;
 
-  constructor(
-    private router: Router,
-    private userService: UserService
-  ) {}
+  private noCacheHeaders = new HttpHeaders({
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Pragma': 'no-cache'
+  });
 
-  ngOnInit(): void {
-    this.getUsers()
+  constructor(private http: HttpClient) {}
+
+  getUsers(): Observable<User[]> {
+    return this.http
+      .get<any>(
+        `${this.apiUrl}/users?t=${new Date().getTime()}`,
+        { headers: this.noCacheHeaders }
+      )
+      .pipe(
+        map((response) => {
+          if (Array.isArray(response)) return response;
+          if (response?.users && Array.isArray(response.users)) return response.users;
+          if (response?.data && Array.isArray(response.data)) return response.data;
+          console.warn('Unexpected getUsers() response shape:', response);
+          return [];
+        })
+      );
   }
 
-  getUsers() {
-    this.loading = true
-    this.errorMessage = ''
-    this.userService.getUsers().subscribe({
-      next: (response) => {
-        this.users = Array.isArray(response) ? response : []
-        this.loading = false
-      },
-      error: (error) => {
-        console.error('Failed to fetch users:', error)
-        this.errorMessage = 'Failed to load users. Please try again.'
-        this.loading = false
-      }
-    })
+  loginUser(data: { userId: string; password: string; role: string }): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/users/login`, data);
   }
 
-  addUser() {
-    if (!this.userId.trim() || !this.password.trim()) {
-      alert('User ID and Password are required.')
-      return
-    }
-
-    const userData = {
-      userId: this.userId.trim(),
-      password: this.password.trim(),
-      role: this.role
-    }
-
-    this.userService.addUser(userData).subscribe({
-      next: (response) => {
-        console.log('User added:', response)
-        alert('User Added Successfully')
-        this.userId = ''
-        this.password = ''
-        this.role = 'General User'
-        this.getUsers()
-      },
-      error: (error) => {
-        console.error('Add user error:', error)
-        alert(error?.error?.message || 'Error Adding User')
-      }
-    })
+  addUser(data: { userId: string; password: string; role: string }): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/users/add`, data);
   }
 
-  logout() {
-    localStorage.removeItem('user')
-    this.router.navigate(['/'])
+  getDashboardData(): Observable<DashboardData> {
+    return this.http.get<DashboardData>(
+      `${this.apiUrl}/users/dashboard?t=${new Date().getTime()}`,
+      { headers: this.noCacheHeaders }
+    );
   }
 }
