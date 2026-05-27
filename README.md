@@ -45,10 +45,10 @@ Password: 12345678
 ## Screenshots
 
 ### Login Page
-![Login](./screenshots/login.png)
+![Login](./screenshots/login.jpg)
 
 ### Admin Dashboard
-![Admin Dashboard](./screenshots/admin-dashboard.png)
+![Admin Dashboard](./screenshots/admin-dashboard.jpg)
 
 ### User Dashboard
-![User Dashboard](./screenshots/user-dashboard.png)
+![User Dashboard](./screenshots/user-dashboard.jpg)
