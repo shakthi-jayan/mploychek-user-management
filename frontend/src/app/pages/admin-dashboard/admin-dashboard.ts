@@ -32,13 +32,13 @@ export class AdminDashboard implements OnInit {
     this.loading = true
     this.errorMessage = ''
     this.userService.getUsers().subscribe({
-      next: (response) => {
-        this.users = Array.isArray(response) ? response : []
+      next: (users) => {
+        this.users = Array.isArray(users) ? users : []
         this.loading = false
       },
       error: (error) => {
-        console.error('Failed to fetch users:', error)
-        this.errorMessage = 'Failed to load users. Please try again.'
+        console.error('getUsers error:', error)
+        this.errorMessage = 'Failed to load users.'
         this.loading = false
       }
     })
@@ -49,16 +49,12 @@ export class AdminDashboard implements OnInit {
       alert('User ID and Password are required.')
       return
     }
-
-    const userData = {
+    this.userService.addUser({
       userId: this.userId.trim(),
       password: this.password.trim(),
       role: this.role
-    }
-
-    this.userService.addUser(userData).subscribe({
-      next: (response) => {
-        console.log('User added:', response)
+    }).subscribe({
+      next: () => {
         alert('User Added Successfully')
         this.userId = ''
         this.password = ''
@@ -66,7 +62,6 @@ export class AdminDashboard implements OnInit {
         this.getUsers()
       },
       error: (error) => {
-        console.error('Add user error:', error)
         alert(error?.error?.message || 'Error Adding User')
       }
     })
