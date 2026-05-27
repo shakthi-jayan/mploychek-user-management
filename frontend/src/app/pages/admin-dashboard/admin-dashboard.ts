@@ -29,8 +29,11 @@ export class AdminDashboard implements OnInit {
   }
 
   getUsers() {
-    this.loading = false;
-    this.http.get<any[]>(`${environment.apiUrl}/users`).subscribe({
+    this.loading = true;
+  
+    this.http.get<any[]>(
+      `${environment.apiUrl}/users?t=${new Date().getTime()}`
+    ).subscribe({
       next: (response) => {
         console.log(response)
         this.users = response
