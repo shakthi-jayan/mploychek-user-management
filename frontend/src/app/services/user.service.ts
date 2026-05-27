@@ -1,49 +1,79 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { CommonModule } from '@angular/common'
+import { Component, OnInit } from '@angular/core'
+import { FormsModule } from '@angular/forms'
+import { Router } from '@angular/router'
+import { UserService } from '../../services/user.service'
 
-interface User {
-  userId: string;
-  password?: string;
-  role: string;
-}
-
-interface LoginResponse {
-  message: string;
-  user: User;
-}
-
-interface DashboardData {
-  totalRecords: number;
-  verifiedRecords: number;
-  pendingRecords: number;
-  verificationRecords: any[];
-}
-
-@Injectable({
-  providedIn: 'root'
+@Component({
+  selector: 'app-admin-dashboard',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './admin-dashboard.html',
+  styleUrl: './admin-dashboard.css'
 })
-export class UserService {
-  private apiUrl = environment.apiUrl;
+export class AdminDashboard implements OnInit {
+  users: any[] = []
+  loading = false
+  errorMessage = ''
+  userId = ''
+  password = ''
+  role = 'General User'
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private router: Router,
+    private userService: UserService
+  ) {}
 
-  getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(
-      `${this.apiUrl}/users?t=${new Date().getTime()}`
-    );
+  ngOnInit(): void {
+    this.getUsers()
   }
 
-  loginUser(data: { userId: string; password: string; role: string }): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/users/login`, data);
+  getUsers() {
+    this.loading = true
+    this.errorMessage = ''
+    this.userService.getUsers().subscribe({
+      next: (response) => {
+        this.users = Array.isArray(response) ? response : []
+        this.loading = false
+      },
+      error: (error) => {
+        console.error('Failed to fetch users:', error)
+        this.errorMessage = 'Failed to load users. Please try again.'
+        this.loading = false
+      }
+    })
   }
 
-  addUser(data: { userId: string; password: string; role: string }): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/users/add`, data);
+  addUser() {
+    if (!this.userId.trim() || !this.password.trim()) {
+      alert('User ID and Password are required.')
+      return
+    }
+
+    const userData = {
+      userId: this.userId.trim(),
+      password: this.password.trim(),
+      role: this.role
+    }
+
+    this.userService.addUser(userData).subscribe({
+      next: (response) => {
+        console.log('User added:', response)
+        alert('User Added Successfully')
+        this.userId = ''
+        this.password = ''
+        this.role = 'General User'
+        this.getUsers()
+      },
+      error: (error) => {
+        console.error('Add user error:', error)
+        alert(error?.error?.message || 'Error Adding User')
+      }
+    })
   }
 
-  getDashboardData(): Observable<DashboardData> {
-    return this.http.get<DashboardData>(`${this.apiUrl}/users/dashboard`);
+  logout() {
+    localStorage.removeItem('user')
+    this.router.navigate(['/'])
   }
 }
