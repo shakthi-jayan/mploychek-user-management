@@ -3,19 +3,17 @@ import bcrypt from "bcryptjs"
 
 export const getAllUsers = async (req, res) => {
     try {
-        res.set({
-            'Cache-Control': 'no-store',
-            'Pragma': 'no-cache',
-            'Expires': '0'
-        })
         const users = await User.find()
-        setTimeout(() => {
-            res.status(200).json(users)
-        }, 3000)
-    } catch(e) {
+
+        await new Promise(resolve => setTimeout(resolve, 3000))
+
+        res.status(200).json(users)
+
+    } catch (e) {
         console.log("Error:", e)
+
         res.status(500).json({
-            message:"Error fetching users"
+            message: "Error fetching users"
         })
     }
 }
