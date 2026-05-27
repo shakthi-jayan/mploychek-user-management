@@ -1,9 +1,8 @@
 import { CommonModule } from '@angular/common'
-import { HttpClient } from '@angular/common/http'
 import { Component, OnInit } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
-import { environment } from '../../../environments/environment'
+import { UserService } from '../../services/user.service'
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -21,7 +20,7 @@ export class AdminDashboard implements OnInit {
 
   constructor(
     private router: Router,
-    private http: HttpClient
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -29,11 +28,8 @@ export class AdminDashboard implements OnInit {
   }
 
   getUsers() {
-    this.loading = true;
-  
-    this.http.get<any[]>(
-      `${environment.apiUrl}/users?t=${new Date().getTime()}`
-    ).subscribe({
+    this.loading = true
+    this.userService.getUsers().subscribe({
       next: (response) => {
         console.log(response)
         this.users = response
@@ -53,7 +49,7 @@ export class AdminDashboard implements OnInit {
       role: this.role
     }
 
-    this.http.post(`${environment.apiUrl}/users/add`, userData).subscribe({
+    this.userService.addUser(userData).subscribe({
       next: (response) => {
         console.log(response)
         alert('User Added')
