@@ -30,9 +30,9 @@ export class AdminDashboard implements OnInit {
   getUsers() {
     this.loading = true
     this.userService.getUsers().subscribe({
-      next: (response) => {
+      next: (response: any) => {
         console.log(response)
-        this.users = response
+        this.users = response.users || response.data || response
         this.loading = false
       },
       error: (error) => {
