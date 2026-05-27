@@ -14,6 +14,7 @@ import { UserService } from '../../services/user.service'
 export class AdminDashboard implements OnInit {
   users: any[] = []
   loading = false
+  errorMessage = ''
   userId = ''
   password = ''
   role = 'General User'
@@ -29,38 +30,44 @@ export class AdminDashboard implements OnInit {
 
   getUsers() {
     this.loading = true
+    this.errorMessage = ''
     this.userService.getUsers().subscribe({
-      next: (response: any) => {
-        console.log(response)
-        this.users = response.users || response.data || response
+      next: (response) => {
+        this.users = Array.isArray(response) ? response : []
         this.loading = false
       },
       error: (error) => {
-        console.log(error)
+        console.error('Failed to fetch users:', error)
+        this.errorMessage = 'Failed to load users. Please try again.'
         this.loading = false
       }
     })
   }
 
   addUser() {
+    if (!this.userId.trim() || !this.password.trim()) {
+      alert('User ID and Password are required.')
+      return
+    }
+
     const userData = {
-      userId: this.userId,
-      password: this.password,
+      userId: this.userId.trim(),
+      password: this.password.trim(),
       role: this.role
     }
 
     this.userService.addUser(userData).subscribe({
       next: (response) => {
-        console.log(response)
-        alert('User Added')
+        console.log('User added:', response)
+        alert('User Added Successfully')
         this.userId = ''
         this.password = ''
         this.role = 'General User'
         this.getUsers()
       },
       error: (error) => {
-        console.log(error)
-        alert('Error Adding User')
+        console.error('Add user error:', error)
+        alert(error?.error?.message || 'Error Adding User')
       }
     })
   }
