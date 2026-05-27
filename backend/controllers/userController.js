@@ -48,40 +48,37 @@ export const addUser = async (req, res) => {
 }
 
 export const loginUser = async (req, res) => {
-    try{
-        const { userId, password, role } = req.body
-        const user = await User.findOne({
-            userId,
-            role
-        })
-        if(!user){
-            return res.status(401).json({
-                message:"Invalid Credentials"
-            })
-        }
-        const isMatch = await bcrypt.compare(
-            password,
-            user.password
-        )
-        setTimeout(() => {
-            if(isMatch){
-                res.status(200).json({
-                    message:"Login Successful",
-                    user:{
-                        userId:user.userId,
-                        role:user.role
-                    }
-                })
-            }else{
-                res.status(401).json({
-                    message:"Invalid Credentials"
-                })
-            }
-        }, 3000)
-    }catch(e){
-        console.log("Error:",e)
-        res.status(500).json({
-            message:"Login Error"
-        })
+  try {
+    console.log("BODY:", req.body)
+    const { userId, password, role } = req.body
+
+    const user = await User.findOne({ userId, role })
+    console.log("FOUND USER:", user)
+
+    if (!user) {
+      return res.status(401).json({
+        message: "Invalid Credentials"
+      })
     }
+
+    console.log("USER PASSWORD:", user.password)
+    const isMatch = await bcrypt.compare(password, user.password)
+    console.log("PASSWORD MATCH:", isMatch)
+
+    if (isMatch) {
+      res.status(200).json({
+        message: "Login Successful",
+        user
+      })
+    } else {
+      res.status(401).json({
+        message: "Invalid Credentials"
+      })
+    }
+  } catch (e) {
+    console.log("LOGIN ERROR:", e)
+    res.status(500).json({
+      message: "Login Error"
+    })
+  }
 }
