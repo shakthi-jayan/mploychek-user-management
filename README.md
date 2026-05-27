@@ -45,7 +45,7 @@ Password: 12345678
 ## Screenshots
 
 ### Login Page
-![Login](./screenshots/login.jpg)
+![Login](./screenshots/login-page.jpg)
 
 ### Admin Dashboard
 ![Admin Dashboard](./screenshots/admin-dashboard.jpg)
