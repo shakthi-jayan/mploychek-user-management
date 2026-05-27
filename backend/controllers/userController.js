@@ -15,7 +15,7 @@ export const getAllUsers = async (req, res) => {
     } catch(e) {
         console.log("Error:", e)
         res.status(500).json({
-            message: "Error fetching users"
+            message:"Error fetching users"
         })
     }
 }
