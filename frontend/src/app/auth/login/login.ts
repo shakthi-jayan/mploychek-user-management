@@ -1,9 +1,8 @@
 import { CommonModule } from '@angular/common'
-import { HttpClient } from '@angular/common/http'
 import { Component } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
-import { environment } from '../../../environments/environment'
+import { UserService } from '../../services/user.service'
 
 @Component({
   selector: 'app-login',
@@ -19,37 +18,34 @@ export class Login {
   loading = false
 
   constructor(
-    private http: HttpClient,
+    private userService: UserService,
     private router: Router
   ) {}
 
   login() {
     this.loading = true
 
-    const userData = {
+    this.userService.loginUser({
       userId: this.userId,
       password: this.password,
       role: this.role
-    }
+    }).subscribe({
+      next: (response) => {
+        console.log(response)
+        this.loading = false
+        localStorage.setItem('user', JSON.stringify(response.user))
 
-    this.http.post<any>(`${environment.apiUrl}/users/login`, userData)
-      .subscribe({
-        next: (response) => {
-          console.log(response)
-          this.loading = false
-          localStorage.setItem('user', JSON.stringify(response.user))
-
-          if (response.user.role === 'Admin') {
-            this.router.navigate(['/admin-dashboard'])
-          } else {
-            this.router.navigate(['/user-dashboard'])
-          }
-        },
-        error: (error) => {
-          console.log(error)
-          this.loading = false
-          alert('Invalid Credentials')
+        if (response.user.role === 'Admin') {
+          this.router.navigate(['/admin-dashboard'])
+        } else {
+          this.router.navigate(['/user-dashboard'])
         }
-      })
+      },
+      error: (error) => {
+        console.log(error)
+        this.loading = false
+        alert('Invalid Credentials')
+      }
+    })
   }
 }
