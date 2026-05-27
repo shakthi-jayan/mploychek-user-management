@@ -8,20 +8,18 @@
   </div>
 
   <div class="row">
+    <!-- Add User -->
     <div class="col-md-4 mb-4">
       <div class="card shadow border-0 rounded-4 p-4">
         <h4 class="mb-4">Add User</h4>
-        
         <div class="mb-3">
           <label class="form-label">User ID</label>
-          <input type="text" class="form-control" [(ngModel)]="userId">
+          <input type="text" class="form-control" [(ngModel)]="userId" placeholder="Enter User ID">
         </div>
-
         <div class="mb-3">
           <label class="form-label">Password</label>
-          <input type="password" class="form-control" [(ngModel)]="password">
+          <input type="password" class="form-control" [(ngModel)]="password" placeholder="Enter Password">
         </div>
-
         <div class="mb-3">
           <label class="form-label">Role</label>
           <select class="form-select" [(ngModel)]="role">
@@ -29,36 +27,56 @@
             <option value="Admin">Admin</option>
           </select>
         </div>
-
         <button class="btn btn-primary w-100" (click)="addUser()">Add User</button>
       </div>
     </div>
 
+    <!-- Users List -->
     <div class="col-md-8">
       <div class="card shadow border-0 rounded-4 p-4">
         <h4 class="mb-4">Users List</h4>
 
+        <!-- Loading -->
         <div *ngIf="loading" class="text-center p-5">
           <div class="spinner-border text-primary"></div>
           <p class="mt-3">Loading users...</p>
         </div>
 
-        <table *ngIf="!loading" class="table table-hover align-middle">
-          <thead>
+        <!-- Error -->
+        <div *ngIf="!loading && errorMessage" class="alert alert-danger">
+          {{ errorMessage }}
+          <button class="btn btn-sm btn-outline-danger ms-2" (click)="getUsers()">Retry</button>
+        </div>
+
+        <!-- Empty -->
+        <div *ngIf="!loading && !errorMessage && users.length === 0" class="text-center text-muted p-5">
+          No users found.
+        </div>
+
+        <!-- Table -->
+        <table *ngIf="!loading && !errorMessage && users.length > 0" class="table table-hover align-middle">
+          <thead class="table-light">
             <tr>
+              <th>#</th>
               <th>User ID</th>
               <th>Role</th>
               <th>Created At</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let user of users">
-              <td>{{user.userId}}</td>
-              <td>{{user.role}}</td>
-              <td>{{user.createdAt | date}}</td>
+            <tr *ngFor="let user of users; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>{{ user.userId }}</td>
+              <td>
+                <span class="badge" [ngClass]="user.role === 'Admin' ? 'bg-danger' : 'bg-secondary'">
+                  {{ user.role }}
+                </span>
+              </td>
+              <td>{{ user.createdAt | date: 'dd MMM yyyy, h:mm a' }}</td>
             </tr>
           </tbody>
         </table>
+
       </div>
     </div>
   </div>
