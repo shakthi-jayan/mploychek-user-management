@@ -41,3 +41,14 @@ Password: shakthi1234
 ### General User
 User ID: 13428
 Password: 12345678
+
+## Screenshots
+
+### Login Page
+![Login](./screenshots/login.png)
+
+### Admin Dashboard
+![Admin Dashboard](./screenshots/admin-dashboard.png)
+
+### User Dashboard
+![User Dashboard](./screenshots/user-dashboard.png)
